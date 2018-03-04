@@ -135,12 +135,14 @@ private CharSequence p_label,q_label;
 
             return super.onStartCommand(intent, flags, startId);
         }
+        {  //移除了清空剪贴板的代码。始终觉得这个block是没用的，事实证明就是有作用。可见逻辑没盘清。我觉得原作者也没用盘清。
+       //     cmb = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+         //   ClipData data = ClipData.newPlainText("content", "");
+    //        cmb.setPrimaryClip(data);
+            return super.onStartCommand(intent, flags, startId);
 
-        cmb = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData data = ClipData.newPlainText("content", "");
-        cmb.setPrimaryClip(data);
+        }
 
-        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
