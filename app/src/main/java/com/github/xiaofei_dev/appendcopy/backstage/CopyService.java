@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.xiaofei_dev.appendcopy.R;
@@ -25,6 +26,11 @@ public final class CopyService extends Service {
     /**
      * 控制悬浮图标
      */
+    private int i=0;
+private String p_desc,p_html,p_text,q_desc,q_html,q_text;
+private CharSequence p_label,q_label;
+    private Boolean q_is_html,p_is_html;
+    private TextView append_textview;
     private final int ADD_VIEW = 0;
     private final int ADD_APPEND_VIEW = 1;
 
@@ -34,12 +40,16 @@ public final class CopyService extends Service {
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mLayoutParams;
 
-    private String text = "" ;
+  //   private String text = "" ;
     private boolean isAddView;
     private final Handler mHandler = new Handler();
     private Runnable mAutoRemoveView;
     private int flag = 0;
-    private StringBuilder mStringBuilder = new StringBuilder();
+  //  private StringBuilder mStringBuilder = new StringBuilder();
+//    private StringBuilder tStringBuilder = new StringBuilder();
+  //  public ClipData qClipData;
+    public ClipData xClipData;
+   // private ClipData  pClipData;
     private boolean isFrist = true;
     private static final String TAG = "CopyService";
 
@@ -64,12 +74,49 @@ public final class CopyService extends Service {
 //            return super.onStartCommand(intent, flags, startId);
 //        }
         if(intent != null){
-            text = intent.getStringExtra("TEXT");
+
+            p_label= intent.getStringExtra("LABEL");
+            p_desc= intent.getStringExtra("DESC");
+            p_text= intent.getStringExtra("TEXT");
+            p_is_html= Boolean.valueOf(intent.getStringExtra("is_html"));
+            p_html="";
+            if(p_is_html){
+                {   //格式清理
+                    String text = intent.getStringExtra("HTML");
+                    text = text.replaceAll("\\sstyle=\"[^\"<>]+\"", "");
+                    text = text.replaceAll("\\s*<span[^<>]*>\\s*</span>\\s*", "");
+                    text = text.replaceAll("\\s*<p[^<>]*>\\s*</p>\\s*", "");
+                    text = text.replaceAll("\\s*<div[^<>]*>\\s*</div>\\s*", "");
+                    p_html = text;
+                    Log.d("p_html", p_html);
+                }
+            }
+
         }else {
             return super.onStartCommand(intent, flags, startId);
         }
         if(flag == ADD_APPEND_VIEW){
-            mStringBuilder.append(text);
+            // tm  扩展剪贴板的部分；
+
+            boolean clip_plus= float_p( );
+            if (clip_plus){
+
+          //xtm      mStringBuilder.append(text);
+                i=i+1;
+                if (i<10){
+                    append_textview.setText("+"+i);
+                }else{
+                    append_textview.setText(""+i);
+                }
+                Toast.makeText(getApplicationContext(),R.string.clip_plus,Toast.LENGTH_SHORT).show();
+
+            }else{
+
+//                Toast.makeText(getApplicationContext(),R.string.clip_skip,Toast.LENGTH_SHORT).show();
+
+            }
+
+
         }else if(flag == ADD_VIEW && isAddView && isFrist){
             removeView();
             //已主动调用移除悬浮窗的情况下，取消自动延时移除悬浮窗
@@ -178,7 +225,15 @@ public final class CopyService extends Service {
         mWindowManager.removeView(iconFloatAppendView);
         flag = ADD_VIEW;
 //        isFrist = true;
-        mStringBuilder = mStringBuilder.delete(0,mStringBuilder.length());
+        i=0;
+        //  qClipData=null;
+        q_is_html=null;
+        q_html=null;
+        q_text=null;
+        q_desc=null;
+        q_label=null;
+        xClipData=null;
+    //xtm    mStringBuilder = mStringBuilder.delete(0,mStringBuilder.length());
 //        stopSelf();
     }
 
@@ -188,28 +243,53 @@ public final class CopyService extends Service {
  *desc：初始化两个悬浮窗并添加点击事件
  */
     private void initView(){
+
         iconFloatView = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.floating_icon,null);
+        iconFloatAppendView = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.floating_icon_append,null);
+        append_textview=   (TextView)  iconFloatAppendView.findViewById(R.id.floating_icon_append_textView);
+
+
         iconFloatView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 removeView();
                 //已主动调用移除悬浮窗方法的情况下，取消自动延时移除悬浮窗
                 mHandler.removeCallbacks(mAutoRemoveView);
+                i=1;
+                append_textview.setText("+1");
+               // qClipData=pClipData;
 
-                mStringBuilder.append(text);
-                addAppendView();
+
+                if(p_is_html){
+                    q_is_html=true;
+                    q_html=p_html;
+                }else{
+                    q_is_html=false;
+                }
+                    q_desc = p_desc;
+                    q_label = p_label;
+                    q_text = p_text;
+                    addAppendView();
             }
         });
 
-        iconFloatAppendView = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.floating_icon_append,null);
         iconFloatAppendView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Log.d(TAG, "onClick: " + mStringBuilder.toString());
                 //将拼接好的内容复制至剪贴板
                 cmb = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData data = ClipData.newPlainText("content", mStringBuilder.toString());
-                cmb.setPrimaryClip(data);
+                //xtm  ClipData data = ClipData.newPlainText("content", mStringBuilder.toString());cmb.setPrimaryClip(data);
+               //xxtm cmb.setPrimaryClip(qClipData);
+
+                if(q_is_html){
+
+                    xClipData=ClipData.newHtmlText(q_label,q_text,q_html);
+                }else{
+                    xClipData = ClipData.newPlainText(q_label,q_text);
+                }
+                Log.d("end cmb",xClipData.toString());
+                cmb.setPrimaryClip(xClipData);
                 Toast.makeText(getApplicationContext(),R.string.success,Toast.LENGTH_SHORT).show();
                 removeAppendView();
                 mHandler.postDelayed(new Runnable() {
@@ -248,4 +328,122 @@ public final class CopyService extends Service {
         mLayoutParams.width = iconFloatView.findViewById(R.id.floating_icon).getLayoutParams().width;
         mLayoutParams.height = iconFloatView.findViewById(R.id.floating_icon).getLayoutParams().height;
     }
+
+
+    public boolean float_p( ){
+            CharSequence label= p_label;
+      if (q_desc.equals(p_desc) &  (p_desc.contains("text"))){
+                    int p_length=p_text.length();
+                    int q_length=q_text.length();
+                    // 如果存在包含关系，直接skip；
+                    if(p_length>0){
+                        if (q_text.contains(p_text)){
+                            Toast.makeText(getApplicationContext(),R.string.clip_skip1,Toast.LENGTH_SHORT).show();
+                            return  false;
+                        }else if (p_text.contains(q_text)){
+                            q_text=p_text;
+                            q_html=p_html;
+           //                 Toast.makeText(getApplicationContext(),R.string.clip_skip2,Toast.LENGTH_SHORT).show();
+                            return  true;
+                        }else{
+                            int get_length=p_length;
+                            if (q_length<p_length){
+                                get_length=q_length;
+                            }
+
+                            //  剪贴板去重合并
+                            for(int i=1;i<get_length;i++){
+                                String match_text=p_text.substring(0,i);
+                                int match_index=q_text.lastIndexOf(match_text);
+
+                                if (q_length-match_index==i){
+                                   q_text=q_text+p_text.substring(i);
+
+                                   if(q_is_html){
+                                       //需要增加HTML部分的去重
+
+                                       Boolean exit_html_branch=false;
+                                        int p_length_html=p_html.length();
+                                        int q_length_html=q_html.length();
+                                       // 如果存在包含关系，直接skip；
+                                       if(p_length_html>0){
+                                           if (q_html.contains(p_html)){
+
+                                           }else if (p_html.contains(q_html)){
+                                                q_html=p_html;
+
+                                           }else{
+
+
+
+                                               {//简易使用match_text做一次粗糙的去重
+                                                   int match_index_html_q=q_html.lastIndexOf(match_text);
+                                                   int match_index_html_p=p_html.indexOf(match_text);
+
+                                                   if((match_index_html_p>-1) & (match_index_html_q>-1)){
+                                                       q_html=q_html.substring(0,match_index_html_q)+p_html.substring(match_index_html_p);
+                                                   }else{
+                                                       q_html=q_html+p_html;
+                                                   }
+
+
+                                               }
+
+
+                                               /*
+                                               int get_length_html=p_length_html;
+                                               if (q_length_html<p_length_html){
+                                                   get_length_html=q_length_html;
+                                               }
+
+                                               int j;
+                                       for(j=1;j<get_length_html;j++){
+                                           String match_html=p_html.substring(0,j);
+                                           int match_index2=q_html.lastIndexOf(match_html);
+                                           Log.d("new match loop","j,q_length_html,match_index,match_html:"+j+" "+q_length_html+""+match_html);
+                                           if (q_length_html-match_index2==j){
+                                               q_html=q_html+p_html.substring(j-1);
+                                               j=get_length_html+1;
+                                           }
+                                       }  
+                                       
+                                       if(j>get_length_html){
+                                       q_html=q_html+p_html;
+                                       }
+                                       */
+                                           }
+                                           }
+
+                                   }
+
+
+                                    return true;
+                                }
+                            }
+
+                            //  如果去重失败，直接拼接；这里存在一个问题，HTML类型使用前边的loop是无法正确拼接的。
+                            {
+                               q_text=q_text+" \n"+p_text;
+                                if(q_is_html){
+                                    q_html=q_html+p_html;
+                                }
+                              //xtm  mClipboard.setPrimaryClip(mClipData);
+                                return true;
+                            }
+
+                        }
+                    }
+                }else{
+          Toast.makeText(getApplicationContext(),R.string.clip_skip3,Toast.LENGTH_SHORT).show();
+
+      }
+
+
+
+        Toast.makeText(getApplicationContext(),R.string.clip_skip,Toast.LENGTH_SHORT).show();
+        return  false;
+    }
+
+
+
 }

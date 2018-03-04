@@ -14,6 +14,8 @@ import com.github.xiaofei_dev.appendcopy.R;
 import com.github.xiaofei_dev.appendcopy.backstage.CopyService;
 import com.github.xiaofei_dev.appendcopy.util.ToastUtil;
 
+import java.io.Serializable;
+
 public final class MainActivity extends Activity {
 
     public static int OVERLAY_PERMISSION_REQ_CODE = 110;
@@ -29,9 +31,10 @@ public final class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
+        Log.d("main Start","OK");
         moveTaskToBack(true);
 //        Toast.makeText(getApplicationContext(),R.string.begin,Toast.LENGTH_LONG).show();
-
+        Log.d("main Start","SDK"+Build.VERSION.SDK_INT);
         if(Build.VERSION.SDK_INT >= 23){
             if(Settings.canDrawOverlays(this)){
 //                //有悬浮窗权限则开启服务
@@ -46,11 +49,13 @@ public final class MainActivity extends Activity {
                     Intent  intent=new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
                     startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
                 }catch (Exception e)
+
                 {
                     e.printStackTrace();
                 }
             }
         }else {
+            ToastUtil.showToast(getApplicationContext(),getString(R.string.begin));
             //
         }
 
@@ -124,17 +129,56 @@ public final class MainActivity extends Activity {
         clipBoard.addPrimaryClipChangedListener(new ClipboardManager.OnPrimaryClipChangedListener() {
             @Override
             public void onPrimaryClipChanged() {
+
                 ClipData clipData = clipBoard.getPrimaryClip();
                 ClipData.Item item = clipData.getItemAt(0);
+
+                /*   原判定空文本的方法
                 //String text = item.getText().toString();//万一复制到剪贴板的不是纯文本，此方法将导致程序崩溃
                 String text = item.coerceToText(MainActivity.this).toString();//
                 //下面的条件判断是为了防止与淘宝淘口令的冲突问题。
                 if(text.equals("")){
                     return;
                 }
+                */
+
+
+                String text = item.getText().toString();
+                if (text==null || "".equals(text)){
+                   return ;
+                }
+
+                    String html;
+                    String p_desc = clipData.getDescription().toString();
+                    Boolean is_html=p_desc.contains("text/html");
+                    CharSequence label= clipData.getDescription().getLabel();
+
+                    if (is_html) {
+                        html = item + "";
+                        html = html.substring(18, html.length() - 2);
+
+                        // HTML类型，但是文本内容为空，故复制无效
+                        if(html.equals("")){
+                            return;
+                        }
+
+                    } else
+                    {
+                        html = "";
+
+                    }
+
 
                 Intent intent = new Intent(MainActivity.this,CopyService.class);
+
+                intent.putExtra("is_html",is_html.toString());
                 intent.putExtra("TEXT",text);
+                intent.putExtra("HTML", html);
+                intent.putExtra("DESC",p_desc);
+                intent.putExtra("LABEL",label);
+
+          //      intent.putExtra("pClipData", clipData);
+                // pClipData=abc,与缓存qCLipData相对；
                 MainActivity.this.startService(intent);
             }
         });

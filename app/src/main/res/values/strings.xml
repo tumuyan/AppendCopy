@@ -1,7 +1,12 @@
 <resources>
-    <string name="app_name">复制拼接</string>
+    <string name="app_name">-t Copy</string>
     <!--<string name="checkBox">监听复制事件</string>-->
-    <string name="begin">应用已转至后台默默工作</string>
-    <string name="begin_listening_clip">开始拼接复制内容</string>
-    <string name="success">已将所有文本拼接至剪贴板</string>
+    <string name="begin">服务已经开启</string>
+    <string name="begin_listening_clip">进入工作模式</string>
+    <string name="success">已经完成拼接</string>
+    <string name="clip_plus">喜+1</string>
+    <string name="clip_skip">Skip</string>
+    <string name="clip_skip1">Skip - 原内容已包含这些内容</string>
+    <string name="clip_skip2">Skip - 用新的内容取代原内容</string>
+    <string name="clip_skip3">Skip - 从不同软件复制了内容</string>
 </resources>
