@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,6 +22,7 @@ public final class MainActivity extends Activity {
 
     public static int OVERLAY_PERMISSION_REQ_CODE = 110;
     private static final String TAG = "MainActivity";
+    private Handler mHandler = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,11 +49,12 @@ public final class MainActivity extends Activity {
                 //没有悬浮窗权限,去开启悬浮窗权限
                 ToastUtil.showToast(this,"您需要授予应用在其他应用的上层显示的权限才可正常使用");
                 try{
-                    Intent  intent=new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-                    startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
-                }catch (Exception e)
-
-                {
+//                    Intent  intent=new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+//                    startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+                    Intent intent1 = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+                    intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivityForResult(intent1, OVERLAY_PERMISSION_REQ_CODE);
+                }catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -144,8 +148,13 @@ public final class MainActivity extends Activity {
 
 
                 String text = item.getText().toString();
-                if (text==null || "".equals(text)){
+                if (null==text){
                    return ;
+                }else {
+                   text= text.replaceFirst("^/n+","").replaceFirst("/s*$","");
+                   if(text.length()<1){
+                       return;
+                   }
                 }
 
                     String html;

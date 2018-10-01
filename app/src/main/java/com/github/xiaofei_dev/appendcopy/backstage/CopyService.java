@@ -99,6 +99,8 @@ private CharSequence p_label,q_label;
             // tm  扩展剪贴板的部分；
 
             boolean clip_plus= float_p( );
+            Log.w("Length0",""+q_text.length());
+
             if (clip_plus){
 
           //xtm      mStringBuilder.append(text);
@@ -283,6 +285,7 @@ private CharSequence p_label,q_label;
                 cmb = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 //xtm  ClipData data = ClipData.newPlainText("content", mStringBuilder.toString());cmb.setPrimaryClip(data);
                //xxtm cmb.setPrimaryClip(qClipData);
+                Log.w("Length1",""+q_text.length());
 
                 if(q_is_html){
 
