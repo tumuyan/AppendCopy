@@ -6,6 +6,15 @@
      <img src="screen_2.jpg">
      <img src="screen_3.jpg">
  </figure>
+ 
+ <table>
+     <tr>
+         <td ><center><img src="screen_1" >ScreenShut_1</center></td>
+       <td ><center><img src="screen_2" >ScreenShut_2</center></td>
+            <td ><center><img src="screen_3" >ScreenShut_3</center></td> 
+      </tr>
+ </table>
+  
 一个实现 非连续复制 的小工具。
 
 本应用没有界面，打开后会自动转到后台，进入监听模式。
