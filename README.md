@@ -1,8 +1,11 @@
 # AppendCopy
 复制拼接
 
-![](screen_1.jpg) ![](screen_2.jpg) ![](screen_3.jpg)
-
+ <figure class="third">
+     <img src="screen_1.jpg">
+     <img src="screen_2.jpg">
+     <img src="screen_3.jpg">
+ </figure>
 一个实现 非连续复制 的小工具。
 
 本应用没有界面，打开后会自动转到后台，进入监听模式。

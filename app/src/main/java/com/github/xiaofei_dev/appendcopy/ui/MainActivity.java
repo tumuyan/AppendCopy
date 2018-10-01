@@ -151,7 +151,7 @@ public final class MainActivity extends Activity {
                 if (null==text){
                    return ;
                 }else {
-                   text= text.replaceFirst("^/n+","").replaceFirst("/s*$","");
+                   text= text.replaceFirst("^\n+","").replaceFirst("\\s*$","");
                    if(text.length()<1){
                        return;
                    }
