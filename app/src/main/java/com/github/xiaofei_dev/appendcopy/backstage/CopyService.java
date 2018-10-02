@@ -31,6 +31,7 @@ private String p_desc,p_html,p_text,q_desc,q_html,q_text;
 private CharSequence p_label,q_label;
     private Boolean q_is_html,p_is_html;
     private TextView append_textview;
+    private TextView float_text_0;
     private final int ADD_VIEW = 0;
     private final int ADD_APPEND_VIEW = 1;
 
@@ -54,6 +55,10 @@ private CharSequence p_label,q_label;
     private static final String TAG = "CopyService";
 
     private ClipboardManager cmb;
+
+    private int INFORM_STYLE=1;
+    // %2==1 skip原因显示在悬浮球上
+    //  < 1显示toast信息
 
 
     @Override
@@ -110,7 +115,12 @@ private CharSequence p_label,q_label;
                 }else{
                     append_textview.setText(""+i);
                 }
-                Toast.makeText(getApplicationContext(),R.string.clip_plus,Toast.LENGTH_SHORT).show();
+                if(INFORM_STYLE<1) {
+                    Toast.makeText(getApplicationContext(), R.string.clip_plus, Toast.LENGTH_SHORT).show();
+                }
+                if(INFORM_STYLE%2==1){
+                    append_textview.setBackgroundResource(R.drawable.s1);
+                }
 
             }else{
 
@@ -208,7 +218,10 @@ private CharSequence p_label,q_label;
         mWindowManager.addView(iconFloatAppendView,mLayoutParams);
         flag = ADD_APPEND_VIEW;
         isFrist = false;
-        Toast.makeText(getApplicationContext(),R.string.begin_listening_clip,Toast.LENGTH_SHORT).show();
+        if(INFORM_STYLE<1){
+            Toast.makeText(getApplicationContext(),R.string.begin_listening_clip,Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     /**
@@ -248,9 +261,10 @@ private CharSequence p_label,q_label;
  */
     private void initView(){
 
-        iconFloatView = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.floating_icon,null);
+        iconFloatView = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.floating_icon_start,null);
         iconFloatAppendView = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.floating_icon_append,null);
         append_textview=   (TextView)  iconFloatAppendView.findViewById(R.id.floating_icon_append_textView);
+        float_text_0=   (TextView)  iconFloatView.findViewById(R.id.floating_icon_append_textView);
 
 
         iconFloatView.setOnClickListener(new View.OnClickListener() {
@@ -295,7 +309,9 @@ private CharSequence p_label,q_label;
                 }
                 Log.d("end cmb",xClipData.toString());
                 cmb.setPrimaryClip(xClipData);
-                Toast.makeText(getApplicationContext(),R.string.success,Toast.LENGTH_SHORT).show();
+            //    if(INFORM_STYLE<1) {
+                    Toast.makeText(getApplicationContext(), R.string.success, Toast.LENGTH_SHORT).show();
+              //  }
                 removeAppendView();
                 mHandler.postDelayed(new Runnable() {
                     @Override
@@ -330,8 +346,8 @@ private CharSequence p_label,q_label;
                 | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
         mLayoutParams.format = PixelFormat.TRANSLUCENT;
         mLayoutParams.y = screenHeight/3;
-        mLayoutParams.width = iconFloatView.findViewById(R.id.floating_icon).getLayoutParams().width;
-        mLayoutParams.height = iconFloatView.findViewById(R.id.floating_icon).getLayoutParams().height;
+        mLayoutParams.width = iconFloatView.findViewById(R.id.floating_icon_append_textView).getLayoutParams().width;
+        mLayoutParams.height = iconFloatView.findViewById(R.id.floating_icon_append_textView).getLayoutParams().height;
     }
 
 
@@ -343,7 +359,13 @@ private CharSequence p_label,q_label;
                     // 如果存在包含关系，直接skip；
                     if(p_length>0){
                         if (q_text.contains(p_text)){
-                            Toast.makeText(getApplicationContext(),R.string.clip_skip1,Toast.LENGTH_SHORT).show();
+                            if(INFORM_STYLE<1) {
+                                Toast.makeText(getApplicationContext(), R.string.clip_skip1, Toast.LENGTH_SHORT).show();
+                            }
+                            if(INFORM_STYLE%2==1){
+                                append_textview.setBackgroundResource(R.drawable.s2);
+                                append_textview.setText("重");
+                            }
                             return  false;
                         }else if (p_text.contains(q_text)){
                             q_text=p_text;
@@ -439,13 +461,19 @@ private CharSequence p_label,q_label;
                         }
                     }
                 }else{
-          Toast.makeText(getApplicationContext(),R.string.clip_skip3,Toast.LENGTH_SHORT).show();
-
+          if(INFORM_STYLE<1) {
+              Toast.makeText(getApplicationContext(), R.string.clip_skip3, Toast.LENGTH_SHORT).show();
+          }
+          if(INFORM_STYLE%2==1){
+              append_textview.setBackgroundResource(R.drawable.s2);
+              append_textview.setText("异");
+          }
       }
 
 
-
-        Toast.makeText(getApplicationContext(),R.string.clip_skip,Toast.LENGTH_SHORT).show();
+        if(INFORM_STYLE<1) {
+            Toast.makeText(getApplicationContext(), R.string.clip_skip, Toast.LENGTH_SHORT).show();
+        }
         return  false;
     }
 

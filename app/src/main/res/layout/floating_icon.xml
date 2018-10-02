@@ -10,6 +10,6 @@
         android:id="@+id/floating_icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/ic_floating_icon"/>
+        android:src="@drawable/s0"/>
 </LinearLayout>
 

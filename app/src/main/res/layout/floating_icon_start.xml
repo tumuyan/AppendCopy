@@ -11,13 +11,14 @@
         android:id="@+id/floating_icon_append_textView"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_gravity="center"
         android:layout_weight="1"
-        android:background="@drawable/s1"
+        android:background="@drawable/luncher"
         android:gravity="center"
         android:paddingTop="5dp"
         android:textColor="@android:color/background_light"
         android:textStyle="bold"
-        tools:text="重" />
+        tools:text="+1" />
 
     <ImageView
         android:id="@+id/floating_icon_append"
